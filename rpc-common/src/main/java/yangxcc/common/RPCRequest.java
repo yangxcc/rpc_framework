@@ -13,7 +13,7 @@ public class RPCRequest implements Serializable {
     /**
      * 接口名字
      */
-    private String implementName;
+    private String interfaceName;
 
     /**
      * 方法名字
