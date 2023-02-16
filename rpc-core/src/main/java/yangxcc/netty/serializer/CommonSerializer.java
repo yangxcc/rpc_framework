@@ -10,11 +10,16 @@ public interface CommonSerializer {
     int getCode();
 
     static CommonSerializer getSerializerByCode(int code) {
-        if (code == SERIALIZE_BY_JSON.getCode()) {
-            return new JSONSerializer();
-        } else {
-            return null;
+        switch (code) {
+            case 1 : {
+                return new JSONSerializer();
+            }
+            case 0 : {
+                return new KryoSerializer();
+            }
         }
+
+        return null;
     }
 
 }

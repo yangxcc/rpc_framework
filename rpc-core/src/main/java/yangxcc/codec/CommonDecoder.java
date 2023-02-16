@@ -47,6 +47,7 @@ public class CommonDecoder extends ReplayingDecoder {
         }
 
         int serializeType = byteBuf.readInt();
+        log.info("序列器的序号为{}", serializeType);
         CommonSerializer serializer = CommonSerializer.getSerializerByCode(serializeType);
         if (serializer == null) {
             log.error("未知反序列器");

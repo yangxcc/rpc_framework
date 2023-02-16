@@ -13,6 +13,7 @@ import yangxcc.codec.CommonEncoder;
 import yangxcc.common.RPCRequest;
 import yangxcc.common.RPCResponse;
 import yangxcc.netty.serializer.JSONSerializer;
+import yangxcc.netty.serializer.KryoSerializer;
 
 @Slf4j
 public class NettyClient implements RPCClient {
@@ -36,7 +37,7 @@ public class NettyClient implements RPCClient {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new CommonDecoder())
-                                .addLast(new CommonEncoder(new JSONSerializer()))
+                                .addLast(new CommonEncoder(new KryoSerializer()))
                                 .addLast(new NettyClientHandler());
                     }
                 });
