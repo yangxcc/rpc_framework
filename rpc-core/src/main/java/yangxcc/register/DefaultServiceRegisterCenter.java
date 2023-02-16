@@ -13,9 +13,9 @@ import java.util.HashSet;
 public class DefaultServiceRegisterCenter implements ServiceRegister {
     // 无需使用ConcurrentHashMap？？？
     // 服务名称（接口名）对应的服务实体对象
-    private final HashMap<String, Object> serviceMap = new HashMap<>();
+    private static final HashMap<String, Object> serviceMap = new HashMap<>();
     // 已经注册过的类
-    private final HashSet<String> registeredService = new HashSet<>();
+    private static final HashSet<String> registeredService = new HashSet<>();
 
     @Override
     public <T> void register(T service) {

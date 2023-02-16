@@ -1,13 +1,16 @@
 package yangxcc.test;
 
+import yangxcc.client.RPCClient;
 import yangxcc.client.RPCClientProxy;
 import yangxcc.rpc.api.entity.HelloObject;
 import yangxcc.rpc.api.service.HelloService;
+import yangxcc.socket.SocketClient;
 
-public class TestClient {
+public class SocketTestClient {
 
     public static void main(String[] args) {
-        RPCClientProxy proxy = new RPCClientProxy("127.0.0.1", 9000);
+        RPCClient client = new SocketClient("127.0.0.1", 9000);
+        RPCClientProxy proxy = new RPCClientProxy(client);
         HelloService service = proxy.getProxy(HelloService.class);
 
         System.out.println("准备发送");

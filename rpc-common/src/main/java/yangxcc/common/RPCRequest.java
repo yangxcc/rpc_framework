@@ -1,14 +1,16 @@
 package yangxcc.common;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 
 @Slf4j
 @Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor   // 需要有一个无参构造器，否则序列化会出错
 public class RPCRequest implements Serializable {
     /**
      * 接口名字
