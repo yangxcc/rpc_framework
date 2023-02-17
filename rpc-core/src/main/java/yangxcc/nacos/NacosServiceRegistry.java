@@ -11,30 +11,31 @@ import yangxcc.common.exception.RPCException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+import yangxcc.common.enumdata.NacosInfo;
+import yangxcc.common.utils.NacosUtils;
+import yangxcc.loadbalancer.LoadBalancer;
+import yangxcc.loadbalancer.RandomLoadBalancer;
+
 @Slf4j
 public class NacosServiceRegistry implements ServiceRegistry {
-    private static final String SERVER_ADDR = "192.168.95.132:8848";
     private static final NamingService namingService;
+    private final LoadBalancer loadBalancer;
+
+    public NacosServiceRegistry(LoadBalancer loadBalancer) {
+        if (loadBalancer == null) {
+            this.loadBalancer = new RandomLoadBalancer();
+        } else {
+            this.loadBalancer = loadBalancer;
+        }
+    }
 
     static {
-        try {
-            namingService = NamingFactory.createNamingService(SERVER_ADDR);
-            log.info("成功连接nacos");
-        } catch (NacosException e) {
-            log.error("连接nacos时有错误发生：{}", e.toString());
-            throw new RPCException(RPCError.FAIL_CONNECT_TO_NACOS);
-        }
+        namingService = NacosUtils.getNamingService();
     }
 
     @Override
     public void register(String serviceName, InetSocketAddress address) {
-        try {
-            namingService.registerInstance(serviceName, address.getHostName(), address.getPort());
-            log.info("服务注册成功:{},{},{}", serviceName, address.getHostName(), address.getPort());
-        } catch (NacosException e) {
-            log.error("向nacos注册服务时有错误发生：{}", e.toString());
-            throw new RPCException(RPCError.REGISTER_SERVICE_FAILED);
-        }
+        NacosUtils.registerService(serviceName, address);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class NacosServiceRegistry implements ServiceRegistry {
              * 通过 getAllInstance 获取到某个服务的所有提供者列表后，需要选择一个，
              * 这里就涉及了负载均衡策略，这里我们先选择第 0 个，负载均衡内容后面再说
              */
-            Instance instance = allInstances.get(0);
+            Instance instance = loadBalancer.select(allInstances);
             return new InetSocketAddress(instance.getIp(), instance.getPort());
 
         } catch (NacosException e) {

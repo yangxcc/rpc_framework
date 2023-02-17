@@ -14,6 +14,8 @@ import yangxcc.common.RPCRequest;
 import yangxcc.common.RPCResponse;
 import yangxcc.common.enumdata.RPCError;
 import yangxcc.common.exception.RPCException;
+import yangxcc.loadbalancer.LoadBalancer;
+import yangxcc.loadbalancer.RoundRobinLoadBalancer;
 import yangxcc.nacos.NacosServiceRegistry;
 import yangxcc.nacos.ServiceRegistry;
 import yangxcc.netty.serializer.CommonSerializer;
@@ -28,9 +30,9 @@ public class NettyClient implements RPCClient {
 
     private CommonSerializer serializer;
 
-    public NettyClient() {
-        this.serviceRegistry = new NacosServiceRegistry();
-    }
+    public NettyClient(LoadBalancer loadBalancer) {
+        this.serviceRegistry = new NacosServiceRegistry(loadBalancer);
+}
 
     static {
         EventLoopGroup group = new NioEventLoopGroup();
@@ -49,6 +51,7 @@ public class NettyClient implements RPCClient {
         }
         try {
             InetSocketAddress address = serviceRegistry.getAddressByServiceName(rpcRequest.getInterfaceName());
+            log.info(address.toString());
 
             Channel channel = ChannelProvider.get(address, serializer);
             if (channel != null) {

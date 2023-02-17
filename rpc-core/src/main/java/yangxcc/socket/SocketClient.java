@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import yangxcc.client.RPCClient;
 import yangxcc.common.RPCRequest;
+import yangxcc.loadbalancer.RoundRobinLoadBalancer;
 import yangxcc.nacos.NacosServiceRegistry;
 import yangxcc.nacos.ServiceRegistry;
 import yangxcc.netty.serializer.CommonSerializer;
@@ -19,7 +20,7 @@ public class SocketClient implements RPCClient {
     private ServiceRegistry serviceRegistry;
 
     public SocketClient() {
-        this.serviceRegistry = new NacosServiceRegistry();
+        this.serviceRegistry = new NacosServiceRegistry(new RoundRobinLoadBalancer());
     }
     @Override
     @SneakyThrows

@@ -2,6 +2,8 @@ package yangxcc.test;
 
 import yangxcc.client.RPCClient;
 import yangxcc.client.RPCClientProxy;
+import yangxcc.loadbalancer.LoadBalancer;
+import yangxcc.loadbalancer.RoundRobinLoadBalancer;
 import yangxcc.netty.client.NettyClient;
 import yangxcc.netty.serializer.KryoSerializer;
 import yangxcc.rpc.api.entity.HelloObject;
@@ -9,7 +11,9 @@ import yangxcc.rpc.api.service.HelloService;
 
 public class NettyTestClient {
     public static void main(String[] args) {
-        RPCClient client = new NettyClient();
+        LoadBalancer loadBalancer = new RoundRobinLoadBalancer();
+
+        RPCClient client = new NettyClient(loadBalancer);
         client.setSerializer(new KryoSerializer());
 
         RPCClientProxy proxy = new RPCClientProxy(client);

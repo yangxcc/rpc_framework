@@ -12,8 +12,11 @@ import yangxcc.codec.CommonDecoder;
 import yangxcc.codec.CommonEncoder;
 import yangxcc.common.enumdata.RPCError;
 import yangxcc.common.exception.RPCException;
+import yangxcc.loadbalancer.LoadBalancer;
+import yangxcc.loadbalancer.RoundRobinLoadBalancer;
 import yangxcc.nacos.NacosServiceRegistry;
 import yangxcc.nacos.ServiceRegistry;
+import yangxcc.nacos.hook.ShutdownHook;
 import yangxcc.netty.serializer.CommonSerializer;
 import yangxcc.netty.serializer.KryoSerializer;
 import yangxcc.register.ServiceProviderImpl;
@@ -34,7 +37,7 @@ public class NettyServer implements RPCServer {
         this.host = host;
         this.port = port;
         serviceProvider = new ServiceProviderImpl();
-        serviceRegistry = new NacosServiceRegistry();
+        serviceRegistry = new NacosServiceRegistry(null);
     }
 
     @Override
@@ -48,7 +51,7 @@ public class NettyServer implements RPCServer {
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .option(ChannelOption.SO_BACKLOG, 256)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
+//                    .option(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, true)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         // 责任链模式，编码器，解码器，处理器
@@ -62,6 +65,7 @@ public class NettyServer implements RPCServer {
                     });
 
             ChannelFuture future = serverBootstrap.bind(host, port).sync();
+            ShutdownHook.getShutdownHook().clearAllRegisteredServiceHook();
             future.channel().closeFuture().sync();
 
         } catch (InterruptedException e) {

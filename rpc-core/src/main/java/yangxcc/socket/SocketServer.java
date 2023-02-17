@@ -3,6 +3,7 @@ package yangxcc.socket;
 import lombok.extern.slf4j.Slf4j;
 import yangxcc.common.enumdata.RPCError;
 import yangxcc.common.exception.RPCException;
+import yangxcc.loadbalancer.RoundRobinLoadBalancer;
 import yangxcc.nacos.NacosServiceRegistry;
 import yangxcc.nacos.ServiceRegistry;
 import yangxcc.netty.serializer.CommonSerializer;
@@ -38,7 +39,7 @@ public class SocketServer implements RPCServer {
         this.host = host;
 
         this.serviceProvider = new ServiceProviderImpl();
-        this.serviceRegistry = new NacosServiceRegistry();
+        this.serviceRegistry = new NacosServiceRegistry(new RoundRobinLoadBalancer());
 
         BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(WORK_QUEUE_SIZE);
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
