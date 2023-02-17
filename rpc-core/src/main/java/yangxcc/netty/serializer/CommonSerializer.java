@@ -1,7 +1,5 @@
 package yangxcc.netty.serializer;
 
-import static yangxcc.common.enumdata.SerializeCode.SERIALIZE_BY_JSON;
-
 public interface CommonSerializer {
     byte[] serialize(Object o);
 
