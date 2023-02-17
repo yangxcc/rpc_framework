@@ -1,8 +1,7 @@
 package yangxcc.server.test;
 
-import lombok.extern.slf4j.Slf4j;
-import yangxcc.register.DefaultServiceRegisterCenter;
-import yangxcc.register.ServiceRegister;
+import yangxcc.register.ServiceProviderImpl;
+import yangxcc.register.ServiceProvider;
 import yangxcc.rpc.api.service.HelloService;
 import yangxcc.server.RPCServer;
 import yangxcc.server.serviceImpl.HelloServiceImpl;
@@ -13,10 +12,10 @@ public class SocketTestServer {
     public static void main(String[] args) {
         HelloService service = new HelloServiceImpl();
 
-        ServiceRegister serviceRegister = new DefaultServiceRegisterCenter();
-        serviceRegister.register(service);
+//        ServiceProvider serviceProvider = new ServiceProviderImpl();
+//        serviceProvider.addService(service);
 
-        RPCServer server = new SocketServer(serviceRegister);
-        server.start(9000);
+        RPCServer server = new SocketServer("127.0.0.1", 10000);
+        server.start();
     }
 }

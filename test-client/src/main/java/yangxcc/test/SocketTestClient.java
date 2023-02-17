@@ -9,7 +9,7 @@ import yangxcc.socket.SocketClient;
 public class SocketTestClient {
 
     public static void main(String[] args) {
-        RPCClient client = new SocketClient("127.0.0.1", 9000);
+        RPCClient client = new SocketClient();
         RPCClientProxy proxy = new RPCClientProxy(client);
         HelloService service = proxy.getProxy(HelloService.class);
 

@@ -1,6 +1,5 @@
 package yangxcc.register;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import yangxcc.common.enumdata.RPCError;
 import yangxcc.common.exception.RPCException;
@@ -10,7 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 @Slf4j
-public class DefaultServiceRegisterCenter implements ServiceRegister {
+public class ServiceProviderImpl implements ServiceProvider {
     // 无需使用ConcurrentHashMap？？？
     // 服务名称（接口名）对应的服务实体对象
     private static final HashMap<String, Object> serviceMap = new HashMap<>();
@@ -18,7 +17,7 @@ public class DefaultServiceRegisterCenter implements ServiceRegister {
     private static final HashSet<String> registeredService = new HashSet<>();
 
     @Override
-    public <T> void register(T service) {
+    public <T> void addService(T service) {
         log.info("启动服务注册");
         // 获取类名 yangxcc.server.serviceImpl.HelloServiceImpl
         String serviceName = service.getClass().getCanonicalName();

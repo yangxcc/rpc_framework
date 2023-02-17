@@ -12,18 +12,24 @@ import yangxcc.codec.CommonDecoder;
 import yangxcc.codec.CommonEncoder;
 import yangxcc.common.RPCRequest;
 import yangxcc.common.RPCResponse;
-import yangxcc.netty.serializer.JSONSerializer;
+import yangxcc.common.enumdata.RPCError;
+import yangxcc.common.exception.RPCException;
+import yangxcc.nacos.NacosServiceRegistry;
+import yangxcc.nacos.ServiceRegistry;
+import yangxcc.netty.serializer.CommonSerializer;
 import yangxcc.netty.serializer.KryoSerializer;
+
+import java.net.InetSocketAddress;
 
 @Slf4j
 public class NettyClient implements RPCClient {
-    private String host;
-    private int port;
     private static final Bootstrap bootstrap;
+    private ServiceRegistry serviceRegistry;
 
-    public NettyClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+    private CommonSerializer serializer;
+
+    public NettyClient() {
+        this.serviceRegistry = new NacosServiceRegistry();
     }
 
     static {
@@ -31,24 +37,20 @@ public class NettyClient implements RPCClient {
         bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new CommonDecoder())
-                                .addLast(new CommonEncoder(new KryoSerializer()))
-                                .addLast(new NettyClientHandler());
-                    }
-                });
+                .option(ChannelOption.SO_KEEPALIVE, true);
     }
+
 
     @Override
     public Object sendRequest(RPCRequest rpcRequest) {
+        if (serializer == null) {
+            log.error("客户端未设置序列化器");
+            throw new RPCException(RPCError.SERIALIZER_NOT_FOUND);
+        }
         try {
-            ChannelFuture future = bootstrap.connect(host, port).sync();
-            log.info("客户端连接到服务器{}:{}", host, port);
-            Channel channel = future.channel();
+            InetSocketAddress address = serviceRegistry.getAddressByServiceName(rpcRequest.getInterfaceName());
+
+            Channel channel = ChannelProvider.get(address, serializer);
             if (channel != null) {
                 channel.writeAndFlush(rpcRequest).addListener(future1 -> {
                     if (future1.isSuccess()) {
@@ -68,5 +70,10 @@ public class NettyClient implements RPCClient {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void setSerializer(CommonSerializer serializer) {
+        this.serializer = serializer;
     }
 }

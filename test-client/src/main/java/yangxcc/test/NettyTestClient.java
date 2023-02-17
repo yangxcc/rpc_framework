@@ -3,12 +3,15 @@ package yangxcc.test;
 import yangxcc.client.RPCClient;
 import yangxcc.client.RPCClientProxy;
 import yangxcc.netty.client.NettyClient;
+import yangxcc.netty.serializer.KryoSerializer;
 import yangxcc.rpc.api.entity.HelloObject;
 import yangxcc.rpc.api.service.HelloService;
 
 public class NettyTestClient {
     public static void main(String[] args) {
-        RPCClient client = new NettyClient("127.0.0.1", 10000);
+        RPCClient client = new NettyClient();
+        client.setSerializer(new KryoSerializer());
+
         RPCClientProxy proxy = new RPCClientProxy(client);
         HelloService service = proxy.getProxy(HelloService.class);
 
